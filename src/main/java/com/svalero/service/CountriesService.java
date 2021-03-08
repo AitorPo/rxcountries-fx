@@ -1,7 +1,6 @@
 package com.svalero.service;
 
 import com.svalero.domain.Country;
-import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -24,9 +23,9 @@ public class CountriesService {
         api = retrofit.create(CountriesApiService.class);
     }
 
-    public Call<List<Country>> getAllCountries(){
+    public rx.Observable<List<Country>> getAllCountries(){
         return api.getAllCountries();
     }
 
-    public Call<List<Country>> getCountry(String name) { return api.getCountry(name); }
+    public Observable<List<Country>> getCountry(String name) { return api.getCountry(name); }
 }
