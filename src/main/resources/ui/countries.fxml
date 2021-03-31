@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -11,9 +12,14 @@
       <AnchorPane prefHeight="421.0" prefWidth="600.0">
          <children>
             <ListView fx:id="lvCountries" layoutX="239.0" layoutY="12.0" prefHeight="376.0" prefWidth="303.0" />
-            <TextField fx:id="tfCountry" layoutX="91.0" layoutY="35.0" prefHeight="25.0" prefWidth="94.0" />
-            <Button fx:id="btnSearch" layoutX="91.0" layoutY="77.0" mnemonicParsing="false" onMouseClicked="#findCountry" text="Buscar" />
-            <Button fx:id="btnList" layoutX="91.0" layoutY="112.0" mnemonicParsing="false" onMouseClicked="#listCountries" text="Recargar Lista" />
+            <TextField fx:id="tfCountry" layoutX="14.0" layoutY="42.0" prefHeight="25.0" prefWidth="94.0" />
+            <Button fx:id="btnSearch" layoutX="14.0" layoutY="77.0" mnemonicParsing="false" onMouseClicked="#findCountryByName" text="Buscar por país" />
+            <Button fx:id="btnList" layoutX="138.0" layoutY="361.0" mnemonicParsing="false" onMouseClicked="#listCountries" text="Recargar Lista" />
+            <ProgressIndicator fx:id="piListViewCountriesByName" layoutX="379.0" layoutY="160.0" progress="0.0" />
+            <Button fx:id="btnListByRegion" layoutX="118.0" layoutY="77.0" mnemonicParsing="false" onMouseClicked="#findCountryByRegion" text="Buscar por región" />
+            <ListView fx:id="lvCountriesByRegion" layoutX="14.0" layoutY="112.0" prefHeight="235.0" prefWidth="210.0" />
+            <ProgressIndicator fx:id="piListViewCountriesByRegion" layoutX="97.0" layoutY="200.0" progress="0.0" />
+            <Button fx:id="btnDetailCountry" layoutX="150.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#detailIntent" text="Ver detalles" />
          </children>
       </AnchorPane>
    </children>

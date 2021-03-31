@@ -10,9 +10,11 @@ import rx.Observable;
 import java.util.List;
 
 public interface CountriesApiService {
+
     @GET("/rest/v2/all")
     Observable<List<Country>> getAllCountries();
 
     @GET("/rest/v2/name/{name}")
     Observable<List<Country>> getCountry(@Path("name") String name);
+
 }
