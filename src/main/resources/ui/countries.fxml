@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <MenuBar>
         <menus>
@@ -23,30 +14,20 @@
               <MenuItem mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
         </menus>
       </MenuBar>
       <AnchorPane prefHeight="421.0" prefWidth="600.0">
          <children>
-            <ListView fx:id="lvCountries" layoutX="12.0" layoutY="17.0" prefHeight="343.0" prefWidth="367.0" />
+            <ListView fx:id="lvCountries" layoutX="12.0" layoutY="17.0" onMouseClicked="#setName" prefHeight="343.0" prefWidth="367.0" />
             <TextField fx:id="tfCountry" layoutX="386.0" layoutY="17.0" prefHeight="25.0" prefWidth="195.0" promptText="Buscar..." />
             <Button fx:id="btnSearch" layoutX="387.0" layoutY="110.0" mnemonicParsing="false" onMouseClicked="#findCountryByName" prefHeight="25.0" prefWidth="97.0" text="País" />
-            <Button fx:id="btnList" layoutX="489.0" layoutY="335.0" mnemonicParsing="false" onMouseClicked="#listCountries" prefHeight="25.0" prefWidth="97.0" text="Recargar Lista" />
+            <Button fx:id="btnList" layoutX="391.0" layoutY="335.0" mnemonicParsing="false" onMouseClicked="#listCountries" prefHeight="25.0" prefWidth="195.0" text="Recargar lista inicial" />
             <ProgressIndicator fx:id="piListViewCountriesByName" layoutX="172.0" layoutY="176.0" progress="0.0" />
             <Button fx:id="btnListByRegion" layoutX="489.0" layoutY="110.0" mnemonicParsing="false" onMouseClicked="#findCountryByRegion" prefHeight="25.0" prefWidth="97.0" text="Continente" />
-            <Button fx:id="btnDetailCountry" layoutX="489.0" layoutY="155.0" mnemonicParsing="false" onMouseClicked="#detailIntent" prefHeight="25.0" prefWidth="97.0" text="Ver detalles" />
+            <Button fx:id="btnDetailCountry" layoutX="387.0" layoutY="184.0" mnemonicParsing="false" onMouseClicked="#detailIntent" prefHeight="25.0" prefWidth="97.0" text="Ver detalles" />
             <ComboBox fx:id="cbRegions" layoutX="386.0" layoutY="52.0" prefHeight="25.0" prefWidth="195.0" promptText="Selecciona una región" />
             <Label layoutX="390.0" layoutY="89.0" text="Buscar por:" />
-            <Label layoutX="390.0" layoutY="159.0" prefHeight="17.0" prefWidth="97.0" text="País" />
+            <Label fx:id="lblSelectedCountry" layoutX="390.0" layoutY="159.0" prefHeight="17.0" prefWidth="195.0" />
          </children>
       </AnchorPane>
    </children>

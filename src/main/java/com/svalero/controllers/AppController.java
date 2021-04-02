@@ -28,6 +28,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -40,10 +42,12 @@ public class AppController implements Initializable {
     public ObservableList<String> regionObservableList;
     public ProgressIndicator piListViewCountriesByName;
     public ComboBox<String> cbRegions;
+    public Label lblSelectedCountry;
 
     private CountriesService countriesService;
     private Country selectedCountry;
     private String selectedRegion;
+    private File file;
 
 
     @Override
@@ -55,7 +59,6 @@ public class AppController implements Initializable {
 
         listCountries();
         loadComboBox();
-
     }
 
     private void loadComboBox(){
@@ -87,7 +90,9 @@ public class AppController implements Initializable {
 
     @FXML
     public void listCountries() {
-        list.clear();
+       // Limpiamos la lista para poder rellenarla cada vez que pulsamos un botón que desencadena un event
+       // Así nos evitamos instanciar varias listas
+       list.clear();
        lvCountries.getItems().clear();
        piListViewCountriesByName.setVisible(true);
        piListViewCountriesByName.setProgress(-1);
@@ -113,12 +118,20 @@ public class AppController implements Initializable {
 
     @FXML
     public void findCountryByName(Event event) {
+        // Limpiamos la lista para poder rellenarla cada vez que pulsamos un botón que desencadena un event
+        // Así nos evitamos instanciar varias listas
         list.clear();
         lvCountries.getItems().clear();
         piListViewCountriesByName.setVisible(true);
         piListViewCountriesByName.setProgress(-1);
         lvCountries.setItems(list);
-        String name = tfCountry.getText();
+        String name = tfCountry.getText().toLowerCase();
+        if (name.isEmpty()){
+            AlertUtils.showError("Debes escribir el nombre de un país para poder realizar su búsqueda");
+            listCountries();
+            tfCountry.requestFocus();
+            return;
+        }
 
         countriesService.getCountry(name)
                 .flatMap(Observable::from)
@@ -136,15 +149,23 @@ public class AppController implements Initializable {
 
     @FXML
     public void findCountryByRegion(Event event){
+        // Limpiamos la lista para poder rellenarla cada vez que pulsamos un botón que desencadena un event
+        // Así nos evitamos instanciar varias listas
         list.clear();
         lvCountries.getItems().clear();
         piListViewCountriesByName.setVisible(true);
         piListViewCountriesByName.setProgress(-1);
         selectedRegion = cbRegions.getSelectionModel().getSelectedItem();
+        if (selectedRegion == null){
+            AlertUtils.showError("Debes seleccionar una región en el ComboBox para poder realizar el filtrado");
+            listCountries();
+            cbRegions.requestFocus();
+            return;
+        } else if (selectedRegion.equals("Continente en blanco")) selectedRegion = "";
         // Como hemos asignado un nombre a la región el blanco de la API
         // Tenemos que pasar el valor de ese selectable como "" para que devuelva los países vacíos de esa región
         // Con este if gestionamos la selección de dicha región
-        if (selectedRegion.equals("Continente en blanco")) selectedRegion = "";
+
         lvCountries.setItems(list);
 
         String finalSelectedRegion = selectedRegion;
@@ -170,11 +191,19 @@ public class AppController implements Initializable {
     }
 
     @FXML
+    public void setName(Event event){
+        selectedCountry = lvCountries.getSelectionModel().getSelectedItem();
+        String country = selectedCountry.getName();
+        lblSelectedCountry.setText(country);
+    }
+
+    @FXML
     public void detailIntent(Event event){
         try {
             selectedCountry = lvCountries.getSelectionModel().getSelectedItem();
             if (selectedCountry == null){
-                AlertUtils.showError("Selecciona un país de la lista");
+                AlertUtils.showError("Debes seleccionar un país de la lista para poder ver sus detalles");
+                lvCountries.requestFocus();
                 return;
             }
 
@@ -210,20 +239,30 @@ public class AppController implements Initializable {
     }
 
     @FXML
-    public void onZip(Event event){
+    public void onZip(Event event) throws ExecutionException, InterruptedException {
         Alert conf = new Alert(Alert.AlertType.CONFIRMATION);
         conf.setTitle("Exportar a ZIP");
         conf.setContentText("¿Deseas exportar los datos en un archivo .zip?");
         Optional<ButtonType> res = conf.showAndWait();
         if (res.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) return;
 
-        File file = createAndSaveCSV();
-        exportZippedFile(file);
+        file = createAndSaveCSV();
+
+        CompletableFuture.supplyAsync(() -> {
+            exportZippedFile(file);
+            return file.getAbsolutePath().concat(".zip");
+                }).thenAccept(System.out::println)
+                .whenComplete((unused, throwable) -> {
+                  System.out.println("Zip generado en " + file.getAbsolutePath().concat(".zip"));
+                      Platform.runLater(() -> {
+                          AlertUtils.showAlert("Zip generao correctamente");
+                      });
+                }).get();
     }
 
     private void exportZippedFile(File file){
         try{
-            FileOutputStream fos = new FileOutputStream("C:\\Users\\User\\Desktop\\"+ file.getName().concat(".zip"));
+            FileOutputStream fos = new FileOutputStream(file.getAbsolutePath().concat(".zip"));
             ZipOutputStream zipOut = new ZipOutputStream(fos);
             //File fileToZip = new File("C:\\Users\\User\\Desktop\\" + source);
             FileInputStream fis = new FileInputStream(file + ".csv");
@@ -241,17 +280,13 @@ public class AppController implements Initializable {
             // Borramos el archivo que se genera al invocar al método createAndSaveCSV()
             // para evitar duplicidades y que solo se genere el .zip del mismo
             Files.delete(Path.of(file.getAbsolutePath() + ".csv"));
-            AlertUtils.showAlert("ZIP generado correctamente");
-
         } catch (Exception e){
             e.printStackTrace();
             AlertUtils.showError("Error al zippear");
         }
-
     }
 
     private File createAndSaveCSV(){
-        File file = null;
         try{
             FileChooser fileChooser = new FileChooser();
             file = fileChooser.showSaveDialog(tfCountry.getScene().getWindow());
@@ -273,8 +308,4 @@ public class AppController implements Initializable {
         }
         return file;
     }
-
-
-
-
-   }
+}
