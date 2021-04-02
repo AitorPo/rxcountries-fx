@@ -16,7 +16,6 @@ public class App extends Application {
         loader.setController(new AppController());
         VBox vBox = loader.load();
 
-
         Scene scene = new Scene(vBox);
         stage.setScene(scene);
         stage.show();

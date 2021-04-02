@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -9,17 +14,39 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="miExport" mnemonicParsing="false" onAction="#onExport" text="Export…" />
+              <MenuItem fx:id="miZip" mnemonicParsing="false" onAction="#onZip" text="Zip…" />
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
       <AnchorPane prefHeight="421.0" prefWidth="600.0">
          <children>
-            <ListView fx:id="lvCountries" layoutX="239.0" layoutY="12.0" prefHeight="376.0" prefWidth="303.0" />
-            <TextField fx:id="tfCountry" layoutX="14.0" layoutY="42.0" prefHeight="25.0" prefWidth="94.0" />
-            <Button fx:id="btnSearch" layoutX="14.0" layoutY="77.0" mnemonicParsing="false" onMouseClicked="#findCountryByName" text="Buscar por país" />
-            <Button fx:id="btnList" layoutX="138.0" layoutY="361.0" mnemonicParsing="false" onMouseClicked="#listCountries" text="Recargar Lista" />
-            <ProgressIndicator fx:id="piListViewCountriesByName" layoutX="379.0" layoutY="160.0" progress="0.0" />
-            <Button fx:id="btnListByRegion" layoutX="118.0" layoutY="77.0" mnemonicParsing="false" onMouseClicked="#findCountryByRegion" text="Buscar por región" />
-            <ListView fx:id="lvCountriesByRegion" layoutX="14.0" layoutY="112.0" prefHeight="235.0" prefWidth="210.0" />
-            <ProgressIndicator fx:id="piListViewCountriesByRegion" layoutX="97.0" layoutY="200.0" progress="0.0" />
-            <Button fx:id="btnDetailCountry" layoutX="150.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#detailIntent" text="Ver detalles" />
+            <ListView fx:id="lvCountries" layoutX="12.0" layoutY="17.0" prefHeight="343.0" prefWidth="367.0" />
+            <TextField fx:id="tfCountry" layoutX="386.0" layoutY="17.0" prefHeight="25.0" prefWidth="195.0" promptText="Buscar..." />
+            <Button fx:id="btnSearch" layoutX="387.0" layoutY="110.0" mnemonicParsing="false" onMouseClicked="#findCountryByName" prefHeight="25.0" prefWidth="97.0" text="País" />
+            <Button fx:id="btnList" layoutX="489.0" layoutY="335.0" mnemonicParsing="false" onMouseClicked="#listCountries" prefHeight="25.0" prefWidth="97.0" text="Recargar Lista" />
+            <ProgressIndicator fx:id="piListViewCountriesByName" layoutX="172.0" layoutY="176.0" progress="0.0" />
+            <Button fx:id="btnListByRegion" layoutX="489.0" layoutY="110.0" mnemonicParsing="false" onMouseClicked="#findCountryByRegion" prefHeight="25.0" prefWidth="97.0" text="Continente" />
+            <Button fx:id="btnDetailCountry" layoutX="489.0" layoutY="155.0" mnemonicParsing="false" onMouseClicked="#detailIntent" prefHeight="25.0" prefWidth="97.0" text="Ver detalles" />
+            <ComboBox fx:id="cbRegions" layoutX="386.0" layoutY="52.0" prefHeight="25.0" prefWidth="195.0" promptText="Selecciona una región" />
+            <Label layoutX="390.0" layoutY="89.0" text="Buscar por:" />
+            <Label layoutX="390.0" layoutY="159.0" prefHeight="17.0" prefWidth="97.0" text="País" />
          </children>
       </AnchorPane>
    </children>

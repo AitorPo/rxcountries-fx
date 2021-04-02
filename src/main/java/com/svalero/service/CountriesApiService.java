@@ -1,10 +1,10 @@
 package com.svalero.service;
 
 import com.svalero.domain.Country;
-import javafx.collections.ObservableList;
-import retrofit2.Call;
+import com.svalero.domain.Region;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import rx.Observable;
 
 import java.util.List;
