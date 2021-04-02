@@ -323,16 +323,22 @@ public class AppController implements Initializable {
         FileWriter fw = null;
         try{
             bf = new BufferedReader(new FileReader(fileToModify));
+            // Leemos todas las líneas del archivo a modificar
             String line = bf.readLine();
+            // Recorremos dichas líneas
             while (line != null){
+                // Almacenamos cada línea dentro de "oldContent"
                 oldContent = oldContent + line + System.lineSeparator();
+                // Este while acabará cuando no queden más líneas que leer
                 line = bf.readLine();
             }
-
+            // Dentro de newContent almacenaremos el contenido ya actualizado
             String newContent = oldContent.replaceAll(",", ";");
 
+            // Reescribimos el fichero
             fw = new FileWriter(fileToModify);
             fw.write(newContent);
+
         } catch (IOException ioe){
             ioe.printStackTrace();
             AlertUtils.showError("Error");
