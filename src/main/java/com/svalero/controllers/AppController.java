@@ -161,14 +161,14 @@ public class AppController implements Initializable {
             listCountries();
             cbRegions.requestFocus();
             return;
+            // Como hemos asignado un nombre a la región el blanco de la API
+            // Tenemos que pasar el valor de ese selectable como "" para que devuelva los países vacíos de esa región
+            // Con este if gestionamos la selección de dicha región
         } else if (selectedRegion.equals("Continente en blanco")) selectedRegion = "";
-        // Como hemos asignado un nombre a la región el blanco de la API
-        // Tenemos que pasar el valor de ese selectable como "" para que devuelva los países vacíos de esa región
-        // Con este if gestionamos la selección de dicha región
 
         lvCountries.setItems(list);
-
         String finalSelectedRegion = selectedRegion;
+
         // Obtenemos la lista total de los países de la API
         countriesService.getAllCountries()
                 // "Separamos" la lista en objetos de la clase Country para acceder a sus propiedades y poder filtrar
@@ -300,11 +300,49 @@ public class AppController implements Initializable {
                 csvPrinter.printRecords(country.toCSV().replace(',', ';'));
 
             csvPrinter.close();
-
         } catch (IOException ioe){
             ioe.printStackTrace();
             AlertUtils.showError("Error al exportar los datos");
         }
+        modifyCSV(file.getAbsolutePath().concat(".csv"), ",", ";");
         return file;
+    }
+
+    /**
+     * Método con el que gestionaremos los separadores de nuestro csv para que Excel, por ejemplo,
+     * interprete y coloque toda la información en columnas de forma odenada
+     *
+     * @param path = archivo a modificar
+     * @param oldChar = delimiter (separador) que queremos cambiar
+     * @param newChar = delimiter (separador) que queremos usar
+     */
+    private void modifyCSV(String path, String oldChar, String newChar){
+        File fileToModify = new File(path);
+        String oldContent = "";
+        BufferedReader bf = null;
+        FileWriter fw = null;
+        try{
+            bf = new BufferedReader(new FileReader(fileToModify));
+            String line = bf.readLine();
+            while (line != null){
+                oldContent = oldContent + line + System.lineSeparator();
+                line = bf.readLine();
+            }
+
+            String newContent = oldContent.replaceAll(",", ";");
+
+            fw = new FileWriter(fileToModify);
+            fw.write(newContent);
+        } catch (IOException ioe){
+            ioe.printStackTrace();
+            AlertUtils.showError("Error");
+        } finally {
+            try {
+                bf.close();
+                fw.close();
+            } catch (IOException ioe){
+                ioe.printStackTrace();
+            }
+        }
     }
 }
