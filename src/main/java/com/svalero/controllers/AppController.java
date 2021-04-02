@@ -248,14 +248,13 @@ public class AppController implements Initializable {
 
         file = createAndSaveCSV();
 
-        CompletableFuture.supplyAsync(() -> {
-            exportZippedFile(file);
-            return file.getAbsolutePath().concat(".zip");
-                }).thenAccept(System.out::println)
+        CompletableFuture.supplyAsync(() -> file.getAbsolutePath().concat(".zip"))
+                .thenAccept(System.out::println)
                 .whenComplete((unused, throwable) -> {
                   System.out.println("Zip generado en " + file.getAbsolutePath().concat(".zip"));
                       Platform.runLater(() -> {
-                          AlertUtils.showAlert("Zip generao correctamente");
+                          exportZippedFile(file);
+                          AlertUtils.showAlert("Zip generado correctamente");
                       });
                 }).get();
     }
