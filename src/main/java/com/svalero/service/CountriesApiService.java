@@ -1,7 +1,6 @@
 package com.svalero.service;
 
 import com.svalero.domain.Country;
-import com.svalero.domain.Region;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -16,5 +15,4 @@ public interface CountriesApiService {
 
     @GET("/rest/v2/name/{name}")
     Observable<List<Country>> getCountry(@Path("name") String name);
-
 }

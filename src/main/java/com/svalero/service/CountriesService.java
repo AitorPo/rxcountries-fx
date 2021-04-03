@@ -1,8 +1,6 @@
 package com.svalero.service;
 
 import com.svalero.domain.Country;
-import com.svalero.domain.Region;
-import javafx.collections.ObservableList;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;

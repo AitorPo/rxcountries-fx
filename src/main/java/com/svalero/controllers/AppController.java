@@ -17,9 +17,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 import util.AlertUtils;
+import util.Constants;
 import util.R;
 
 
@@ -34,34 +37,42 @@ import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import static util.Constants.FLUX_URI;
+
 public class AppController implements Initializable {
 
     public TextField tfCountry;
     public ListView<Country> lvCountries;
-    public ObservableList<Country> list;
-    public ObservableList<String> regionObservableList;
-    public ProgressIndicator piListViewCountriesByName;
     public ComboBox<String> cbRegions;
+    public ComboBox<String> cbBloc;
     public Label lblSelectedCountry;
+    public ProgressIndicator piListViewCountriesByName;
 
+    private WebClient webClient;
+
+    private ObservableList<Country> list;
+    private ObservableList<String> regionObservableList;
     private CountriesService countriesService;
     private Country selectedCountry;
     private String selectedRegion;
+    private String selectedBloc;
     private File file;
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         countriesService = new CountriesService();
+        webClient = WebClient.create(Constants.URL);
         list = FXCollections.observableArrayList();
         regionObservableList = FXCollections.observableArrayList();
         piListViewCountriesByName.setVisible(false);
 
         listCountries();
-        loadComboBox();
+        loadRegionsComboBox();
+        loadBlocsComboBox();
     }
 
-    private void loadComboBox(){
+    private void loadRegionsComboBox(){
         cbRegions.setItems(regionObservableList);
         countriesService.getAllCountries()
                 .flatMap(Observable::from)
@@ -80,12 +91,17 @@ public class AppController implements Initializable {
                         if (country.getRegion().equals("")
                                 || country.getRegion().isEmpty()
                                 || country.getRegion() == null){
-                            country.setRegion("Continente en blanco");}
+                            country.setRegion("Pandora");}
                         regionObservableList.add(country.getRegion());
                         System.out.println(country.getRegion() + " añadido a la lista");
                     });
                 });
 
+    }
+
+    private void loadBlocsComboBox(){
+        String[] blocsList = {"EU", "EFTA", "CARICOM", "PA", "AU", "USAN", "EEU", "AL", "ASEAN", "CAIS", "CEFTA", "NAFTA", "SAARC"};
+        cbBloc.setItems(FXCollections.observableArrayList((blocsList)));
     }
 
     @FXML
@@ -148,6 +164,38 @@ public class AppController implements Initializable {
     }
 
     @FXML
+    public void findCountryByBloc(Event event){
+        list.clear();
+        lvCountries.getItems().clear();
+        piListViewCountriesByName.setVisible(true);
+        piListViewCountriesByName.setProgress(-1);
+        lvCountries.setItems(list);
+        selectedBloc = cbBloc.getSelectionModel().getSelectedItem();
+        if (selectedBloc == null){
+            AlertUtils.showError("Debes seleccionar un bloque regional en el ComboBox para poder consumir la API con WebFlux");
+            listCountries();
+            cbBloc.requestFocus();
+            return;
+        }
+
+        Flux<Country> countriesFlux = webClient.get()
+                .uri(FLUX_URI + selectedBloc)
+                .retrieve()
+                .bodyToFlux(Country.class);
+
+        countriesFlux.doOnError(System.out::println)
+                .doOnComplete(() -> {
+                    System.out.println("Países por bloque regonal cargados");
+                    piListViewCountriesByName.setVisible(false);
+                })
+                .subscribe(country -> {
+                    Platform.runLater(() -> {
+                        list.add(country);
+                    });
+                });
+    }
+
+    @FXML
     public void findCountryByRegion(Event event){
         // Limpiamos la lista para poder rellenarla cada vez que pulsamos un botón que desencadena un event
         // Así nos evitamos instanciar varias listas
@@ -164,7 +212,7 @@ public class AppController implements Initializable {
             // Como hemos asignado un nombre a la región el blanco de la API
             // Tenemos que pasar el valor de ese selectable como "" para que devuelva los países vacíos de esa región
             // Con este if gestionamos la selección de dicha región
-        } else if (selectedRegion.equals("Continente en blanco")) selectedRegion = "";
+        } else if (selectedRegion.equals("Pandora")) selectedRegion = "";
 
         lvCountries.setItems(list);
         String finalSelectedRegion = selectedRegion;
@@ -292,7 +340,8 @@ public class AppController implements Initializable {
             FileWriter fileWriter = new FileWriter(file + ".csv");
 
             CSVPrinter csvPrinter = new CSVPrinter(fileWriter,
-                    CSVFormat.DEFAULT.withHeader("País", "Capital", "Continente", "Subregión", "Población"));
+                CSVFormat.DEFAULT.withHeader("País", "Capital", "Continente", "Subregión", "Población"));
+
 
             List<Country> countryList = new ArrayList<>(list);
 
