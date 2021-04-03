@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -24,6 +25,7 @@ public class Country {
     private String region;
     private String subregion;
     private String flag;
+    private List<Bloc> regionalBlocs;
     private long population;
 
     @Override
@@ -31,5 +33,5 @@ public class Country {
         return name + " [" + population + "] ";
     }
 
-    public String toCSV() { return name + ','  + capital + ',' + region + ',' + subregion + ',' + population; }
+    public String toCSV() { return name + ','  + capital + ',' + region + ',' + subregion + ',' + population + ',' + regionalBlocs; }
 }

@@ -28,6 +28,4 @@ public class CountriesService {
     }
 
     public Observable<List<Country>> getCountry(String name) { return api.getCountry(name); }
-
-
 }

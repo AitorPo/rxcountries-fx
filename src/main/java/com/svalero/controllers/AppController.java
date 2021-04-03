@@ -52,6 +52,7 @@ public class AppController implements Initializable {
 
     private ObservableList<Country> list;
     private ObservableList<String> regionObservableList;
+    private ObservableList<String> blocsObservableList;
     private CountriesService countriesService;
     private Country selectedCountry;
     private String selectedRegion;
@@ -65,6 +66,7 @@ public class AppController implements Initializable {
         webClient = WebClient.create(Constants.URL);
         list = FXCollections.observableArrayList();
         regionObservableList = FXCollections.observableArrayList();
+        blocsObservableList = FXCollections.observableArrayList();
         piListViewCountriesByName.setVisible(false);
 
         listCountries();
@@ -79,7 +81,6 @@ public class AppController implements Initializable {
                 .distinct(Country::getRegion)
                 .doOnCompleted(() -> {
                     System.out.println("Regiones cargadas");
-                    piListViewCountriesByName.setVisible(false);
                 })
                 .doOnError(throwable -> System.out.println(throwable.getMessage()))
                 .subscribeOn(Schedulers.from(Executors.newCachedThreadPool()))
@@ -100,8 +101,35 @@ public class AppController implements Initializable {
     }
 
     private void loadBlocsComboBox(){
-        String[] blocsList = {"EU", "EFTA", "CARICOM", "PA", "AU", "USAN", "EEU", "AL", "ASEAN", "CAIS", "CEFTA", "NAFTA", "SAARC"};
-        cbBloc.setItems(FXCollections.observableArrayList((blocsList)));
+        cbBloc.setItems(blocsObservableList);
+
+        countriesService.getAllCountries()
+                .flatMap(Observable::from)
+                .distinct(Country::getRegionalBlocs)
+                .doOnCompleted(() -> {
+                    System.out.println("Bloques regionales cargados");
+                })
+                .doOnError(throwable -> System.out.println(throwable.getMessage()))
+                .subscribeOn(Schedulers.from(Executors.newCachedThreadPool()))
+                .subscribe(country -> {
+                    Platform.runLater(() -> {
+                        // Comprobamos que la lista no sea null
+                        if (country.getRegionalBlocs() != null ) {
+                            // Como en la API existen continentes y países vacíos tenemos que comprobar que la lista de
+                            // bloques regionales no esté vacía para que no salte un error IndexOutOfBoundsException
+                            // y cuando nos topemos con dichos países los omitirá a la hora de añadir su bloque regional
+                            // puesto que no tienen ninguno y así evitamos el error mencionado anteriormente
+                            if (country.getRegionalBlocs().isEmpty()) return;
+                            blocsObservableList.add(country.getRegionalBlocs().get(0).toString());
+                                if (country.getRegionalBlocs().size() > 1){
+                                    blocsObservableList.add(country.getRegionalBlocs().get(1).toString());
+                                }
+                                if (country.getRegionalBlocs().size() > 2){
+                                    blocsObservableList.add(country.getRegionalBlocs().get(2).toString());
+                                }
+                        }
+                    });
+                });
     }
 
     @FXML
@@ -341,7 +369,6 @@ public class AppController implements Initializable {
 
             CSVPrinter csvPrinter = new CSVPrinter(fileWriter,
                 CSVFormat.DEFAULT.withHeader("País", "Capital", "Continente", "Subregión", "Población"));
-
 
             List<Country> countryList = new ArrayList<>(list);
 
